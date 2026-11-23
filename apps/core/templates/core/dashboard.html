@@ -1,0 +1,235 @@
+
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard | FrameFlow{% endblock %}
+
+{% block content %}
+
+<section class="mb-4">
+  <p class="text-muted mb-1">BUSINESS OVERVIEW</p>
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+      <h1 class="mb-2">Welcome to FrameFlow</h1>
+      <p class="text-muted mb-0">
+        Your business finances, organized in one place.
+      </p>
+    </div>
+    <span class="badge rounded-pill text-bg-success px-3 py-2">
+      BUSINESS WORKSPACE
+    </span>
+  </div>
+</section>
+
+<section class="mb-4">
+  <h2 class="h4 mb-3">Financial Analytics</h2>
+  <p class="text-muted small">
+    Live financial summary based on your recorded business transactions.
+  </p>
+
+  <div class="row g-4">
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card h-100 ff-card-accent">
+        <div class="card-body">
+          <p class="text-muted small mb-2">REVENUE RECEIVED</p>
+          <h2 class="h4">{{ studio.currency }} {{ analytics.revenue_received|floatformat:2 }}</h2>
+          <p class="text-muted small mb-0">
+            Valid invoice payments received
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <p class="text-muted small mb-2">OUTSTANDING INVOICES</p>
+          <h2 class="h4">{{ studio.currency }} {{ analytics.outstanding_invoices|floatformat:2 }}</h2>
+          <p class="text-muted small mb-0">
+            Remaining amount to collect
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <p class="text-muted small mb-2">TOTAL EXPENSES</p>
+          <h2 class="h4">{{ studio.currency }} {{ analytics.total_expenses|floatformat:2 }}</h2>
+          <p class="text-muted small mb-0">
+            All recorded business expenses
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <p class="text-muted small mb-2">NET POSITION</p>
+          <h2 class="h4">{{ studio.currency }} {{ analytics.net_position|floatformat:2 }}</h2>
+          <p class="text-muted small mb-0">
+            Revenue received minus expenses
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="text-muted small mt-2">
+    Net position is an estimate from recorded invoice payments and expenses,
+    not a bank balance.
+  </p>
+</section>
+
+<div class="row g-4 mb-4">
+
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card h-100 ff-card-accent">
+      <div class="card-body">
+        <p class="text-muted small mb-2">BUSINESS PROFILE</p>
+        <h2 class="h5 card-title">Business</h2>
+        <p class="mb-1">{{ studio.name }}</p>
+        <p class="text-muted small mb-0">
+          <strong>Business type:</strong>
+          {{ studio.get_business_type_display }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="text-muted small mb-2">CURRENCY</p>
+        <h2 class="h4">{{ studio.currency }}</h2>
+        <p class="text-muted small mb-0">Business currency</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="text-muted small mb-2">CLIENT MANAGEMENT</p>
+        <h2 class="h5">Stay organized</h2>
+        <a href="{% url 'clients:client_list' %}" class="small fw-semibold">
+          View clients &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="text-muted small mb-2">CASH FLOW</p>
+        <h2 class="h5">Plan ahead</h2>
+        <a href="{% url 'forecasting:cashflow' %}" class="small fw-semibold"></a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<section class="mb-4">
+  <h2 class="h4 mb-1">Manage your business</h2>
+  <p class="text-muted small mb-3">
+    Everything you need to manage your business operations.
+  </p>
+
+  <div class="row g-4">
+
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3 class="h5">Clients</h3>
+          <p class="text-muted small">
+            Organize customer information and relationships.
+          </p>
+          <a href="{% url 'clients:client_list' %}" class="btn ff-btn-primary">
+            Manage clients
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3 class="h5">Projects</h3>
+          <p class="text-muted small">
+            Track business jobs, deadlines and project progress.
+          </p>
+          <a href="{% url 'clients:project_list' %}" class="btn ff-btn-primary">
+            Manage projects
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3 class="h5">Invoices</h3>
+          <p class="text-muted small">
+            Create invoices and keep track of payments.
+          </p>
+          <a href="{% url 'finance:invoice_list' %}" class="btn ff-btn-primary">
+            Manage invoices
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3 class="h5">Expenses</h3>
+          <p class="text-muted small">
+            Record and monitor your business expenses.
+          </p>
+          <a href="{% url 'finance:expense_list' %}" class="btn ff-btn-primary">
+            Manage expenses
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3 class="h5">Cash Flow</h3>
+          <p class="text-muted small">
+            Explore projected income, expenses and future balances.
+          </p>
+         <a href="{% url 'forecasting:cashflow' %}" class="btn ff-btn-primary">
+    View cash flow
+</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3 class="h5">Business details</h3>
+          <p class="text-muted small">
+            Review your business configuration and account details.
+          </p>
+          <p class="mb-1 small">
+            <strong>Email:</strong> {{ request.user.email }}
+          </p>
+          <p class="mb-0 small">
+            <strong>Timezone:</strong> {{ studio.timezone }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

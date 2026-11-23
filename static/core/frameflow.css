@@ -1,0 +1,153 @@
+
+:root {
+  --ff-navy: #101B2D;
+  --ff-navy-light: #1B2A40;
+  --ff-teal: #14B8A6;
+  --ff-amber: #F59E0B;
+  --ff-bg: #F8FAFC;
+  --ff-white: #FFFFFF;
+  --ff-text: #172033;
+  --ff-muted: #64748B;
+  --ff-border: #E2E8F0;
+}
+
+body {
+  background: var(--ff-bg);
+  color: var(--ff-text);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.ff-navbar {
+  background: var(--ff-navy);
+  padding: 14px 0;
+  box-shadow: 0 3px 15px rgba(16, 27, 45, 0.12);
+}
+
+.ff-navbar .navbar-brand {
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.ff-navbar .nav-link {
+  color: #CBD5E1;
+  font-weight: 500;
+  padding: 9px 13px;
+  border-radius: 8px;
+  transition: 0.2s ease;
+}
+
+.ff-navbar .nav-link:hover,
+.ff-navbar .nav-link:focus {
+  color: white;
+  background: var(--ff-navy-light);
+}
+
+.ff-navbar .navbar-toggler {
+  border-color: #64748B;
+}
+
+main.container {
+  max-width: 1320px;
+}
+
+.card {
+  border: 1px solid var(--ff-border);
+  border-radius: 14px;
+  background: var(--ff-white);
+  box-shadow: 0 4px 16px rgba(16, 27, 45, 0.045);
+}
+
+.card-body {
+  padding: 24px;
+}
+
+.ff-card-accent {
+  border-top: 4px solid var(--ff-teal);
+}
+
+.ff-btn-primary {
+  background: var(--ff-teal);
+  color: white;
+  border: 1px solid var(--ff-teal);
+  border-radius: 9px;
+  padding: 10px 17px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.ff-btn-primary:hover,
+.ff-btn-primary:focus {
+  background: #0F9488;
+  border-color: #0F9488;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-outline-light {
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+h1, h2, h3, h4 {
+  color: var(--ff-navy);
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.text-muted {
+  color: var(--ff-muted) !important;
+}
+
+.form-control,
+.form-select {
+  border: 1px solid var(--ff-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--ff-teal);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.13);
+}
+
+.table {
+  --bs-table-bg: transparent;
+}
+
+.table thead th {
+  background: #F1F5F9;
+  color: var(--ff-navy);
+  font-weight: 700;
+}
+
+.alert {
+  border-radius: 10px;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--ff-amber);
+  outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  .ff-navbar {
+    padding: 10px 0;
+  }
+
+  .card-body {
+    padding: 18px;
+  }
+
+  .ff-navbar .nav-link {
+    padding: 10px;
+  }
+}

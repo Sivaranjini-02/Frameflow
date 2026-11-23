@@ -18,3 +18,7 @@ media/
 
 # Codebenders IDE state
 .codebenders/
+
+# Local SQLite test database and backup copies
+frameflow_test.sqlite3
+*.bak

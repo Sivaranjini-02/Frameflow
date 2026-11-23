@@ -1,0 +1,43 @@
+
+{% extends 'core/base.html' %}
+
+{% block title %}Invoices · FrameFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <h1 class="h3 mb-0">Invoices</h1>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'core:dashboard' %}">Back to dashboard</a>
+    <a class="btn ff-btn-primary" href="{% url 'finance:invoice_create' %}">New invoice</a>
+  </div>
+</div>
+
+{% if invoices %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Client</th>
+        <th>Status</th>
+        <th>Total</th>
+        <th>Balance due</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for invoice in invoices %}
+      <tr>
+        <td><a href="{% url 'finance:invoice_detail' invoice.pk %}">{{ invoice.invoice_number|default:"Draft" }}</a></td>
+        <td>{{ invoice.client.name }}</td>
+        <td>{{ invoice.get_status_display }}</td>
+        <td>{{ invoice.total }}</td>
+        <td>{{ invoice.balance_due }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">No invoices yet.</p>
+{% endif %}
+{% endblock %}

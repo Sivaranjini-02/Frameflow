@@ -1,0 +1,121 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Invoice · FrameFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <h1 class="h3 mb-0">{{ invoice.invoice_number|default:"Draft invoice" }}</h1>
+    <span class="badge text-bg-secondary">{{ invoice.get_status_display }}</span>
+  </div>
+  <a class="btn btn-outline-secondary" href="{% url 'finance:invoice_list' %}">Back to invoices</a>
+</div>
+
+<div class="mb-4">
+  <div><strong>Client</strong> {{ invoice.client.name }}</div>
+  <div><strong>Project</strong> {{ invoice.project.title|default:"None" }}</div>
+  <div><strong>Issue date</strong> {{ invoice.issue_date|date:"Y-m-d"|default:"-" }}</div>
+  <div><strong>Due date</strong> {{ invoice.due_date|date:"Y-m-d"|default:"-" }}</div>
+</div>
+
+{% if invoice.status == 'draft' %}
+<form method="post" action="{% url 'finance:invoice_issue' invoice.pk %}" class="mb-4">
+  {% csrf_token %}
+  <p class="text-muted small">Issuing assigns the invoice number and locks line items.</p>
+  <button type="submit" class="btn ff-btn-primary">Issue invoice</button>
+</form>
+{% endif %}
+
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Quantity</th>
+        <th>Unit price</th>
+        <th>Line total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in line_items %}
+      <tr>
+        <td>{{ item.description }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.unit_price }}</td>
+        <td>{{ item.line_total }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4" class="text-muted">No line items.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="text-end">
+  <div>Subtotal {{ invoice.subtotal }}</div>
+  {% if invoice.gst_amount > 0 %}
+  <div>GST ({{ invoice.gst_rate }}%) {{ invoice.gst_amount }}</div>
+  {% endif %}
+  <div>Total {{ invoice.total }}</div>
+  <div><strong>Balance due {{ balance_due }}</strong></div>
+</div>
+
+<h2 class="h5 mt-4">Payments</h2>
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Method</th>
+        <th>Reference</th>
+        <th>Amount</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for allocation in allocations %}
+      <tr>
+        <td>{{ allocation.payment.received_on|date:"Y-m-d" }}</td>
+        <td>{{ allocation.payment.get_method_display }}</td>
+        <td>{{ allocation.payment.reference|default:"-" }}</td>
+        <td>{{ allocation.amount }}</td>
+        <td>{% if allocation.payment.reversal %}Reversed{% else %}Applied{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="text-muted">No payments recorded.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if invoice.status == 'issued' or invoice.status == 'partially_paid' %}
+<h2 class="h5 mt-4">Record payment</h2>
+<div class="card shadow-sm ff-card-accent">
+  <div class="card-body">
+    <form method="post" action="{% url 'finance:invoice_record_payment' invoice.pk %}" novalidate>
+      {% csrf_token %}
+      {% for error in payment_form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+      {% endfor %}
+      {% for field in payment_form %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% for error in field.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      <p class="text-muted small">The amount cannot exceed the balance due.</p>
+      <button type="submit" class="btn ff-btn-primary">Record payment</button>
+    </form>
+  </div>
+</div>
+{% elif invoice.status == 'paid' %}
+<p class="text-success mt-4">Paid in full.</p>
+{% endif %}
+{% endblock %}

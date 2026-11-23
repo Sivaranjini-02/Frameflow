@@ -1,0 +1,42 @@
+
+{% extends 'core/base.html' %}
+
+{% block title %}Projects · FrameFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <h1 class="h3 mb-0">Projects</h1>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'core:dashboard' %}">Back to dashboard</a>
+    <a class="btn btn-outline-secondary" href="{% url 'clients:client_list' %}">Clients</a>
+    <a class="btn ff-btn-primary" href="{% url 'clients:project_create' %}">New project</a>
+  </div>
+</div>
+
+{% if projects %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Client</th>
+        <th>Status</th>
+        <th>Due date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project in projects %}
+      <tr>
+        <td>{{ project.title }}</td>
+        <td>{{ project.client.name }}</td>
+        <td>{{ project.get_status_display }}</td>
+        <td>{{ project.event_date|date:"Y-m-d"|default:"-" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">No projects yet.</p>
+{% endif %}
+{% endblock %}

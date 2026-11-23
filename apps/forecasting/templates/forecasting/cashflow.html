@@ -1,0 +1,82 @@
+
+{% extends 'core/base.html' %}
+
+{% block title %}Cash-flow forecast · FrameFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <h1 class="h3 mb-0">Cash-flow forecast</h1>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'core:dashboard' %}">Back to dashboard</a>
+  </div>
+</div>
+
+<div class="card shadow-sm ff-card-accent">
+  <div class="card-body">
+    <form method="post" action="{% url 'forecasting:cashflow_generate' %}" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn ff-btn-primary">Generate forecast</button>
+    </form>
+    <p class="text-muted small">Generates 30-, 60- and 90-day forecasts together, dated from today in {{ studio.timezone }}. Each generation is saved as a new snapshot.</p>
+  </div>
+</div>
+
+{% if not has_runs %}
+<p class="text-muted">No forecast yet. Generate one to see projections.</p>
+{% else %}
+
+{% if first_negative %}
+<div class="alert alert-danger" role="alert"><strong>Projected cash goes negative.</strong> The {{ first_negative.horizon }}-day forecast first dips below zero in the period {{ first_negative.bucket_start }} to {{ first_negative.bucket_end }}, at {{ first_negative.running_balance }}.</div>
+{% else %}
+<div class="alert alert-success" role="alert">No negative projected balance in the 30-, 60- or 90-day forecasts.</div>
+{% endif %}
+
+<h2 class="h5 mt-4">Forecast comparison</h2>
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>Figure</th>
+        {% for col in horizons %}
+        <th>{{ col.days }}-day</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr><th scope="row">{{ row.label }}</th>{% for value in row.values %}<td>{{ value }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2 class="h5 mt-4">Overdue invoices</h2>
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>Horizon</th>
+        <th>Overdue (not in forecast window)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in overdue %}
+      <tr><th scope="row">{{ item.days }}-day forecast</th><td>{{ item.value }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p class="text-muted small">Expected income is the total of draft invoices, placed in the final period of each forecast. Scheduled expenses include only expenses dated after the forecast date. Past expenses are assumed to be included in the opening balance.</p>
+
+<p class="text-muted small">Latest snapshots: {% for run in runs %}{{ run.horizon_days }}-day as of {{ run.as_of|date:"Y-m-d" }} (created {{ run.created_at|date:"Y-m-d H:i" }}){% if not forloop.last %}; {% endif %}{% endfor %}.</p>
+
+{% endif %}
+{% endblock %}
