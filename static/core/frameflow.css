@@ -69,9 +69,9 @@ main.container {
 }
 
 .ff-btn-primary {
-  background: var(--ff-teal);
-  color: white;
-  border: 1px solid var(--ff-teal);
+  background: #087F75;
+  color: #FFFFFF;
+  border: 1px solid #087F75;
   border-radius: 9px;
   padding: 10px 17px;
   font-weight: 600;
@@ -80,9 +80,9 @@ main.container {
 
 .ff-btn-primary:hover,
 .ff-btn-primary:focus {
-  background: #0F9488;
-  border-color: #0F9488;
-  color: white;
+  background: #06665F;
+  border-color: #06665F;
+  color: #FFFFFF;
   transform: translateY(-1px);
 }
 

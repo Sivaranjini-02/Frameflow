@@ -1,4 +1,5 @@
 
+import json
 from datetime import datetime
 from decimal import Decimal
 from zoneinfo import ZoneInfo
@@ -108,6 +109,23 @@ def _render(request, studio, form):
         for horizon in horizons
     ]
 
+    # Prepare real forecast data for the cash-flow chart.
+    chart_labels = ["Days 1–30", "Days 31–60", "Days 61–90"]
+
+    chart_datasets = []
+    for horizon in horizons:
+        run = runs[horizon]
+        balances = (
+            [float(bucket["running_balance"]) for bucket in run.buckets]
+            if run is not None
+            else []
+        )
+
+        chart_datasets.append({
+            "label": f"{horizon}-day forecast",
+            "data": balances,
+        })
+
     context = {
         "studio": studio,
         "form": form,
@@ -121,6 +139,8 @@ def _render(request, studio, form):
             for horizon in horizons
             if runs[horizon] is not None
         ],
+        "chart_labels": json.dumps(chart_labels),
+        "chart_datasets": json.dumps(chart_datasets),
     }
 
     return render(

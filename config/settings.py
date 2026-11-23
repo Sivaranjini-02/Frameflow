@@ -48,6 +48,24 @@ ALLOWED_HOSTS = env_list(
     'DJANGO_ALLOWED_HOSTS',
     default='localhost,127.0.0.1'
 )
+# HTTPS and browser security settings
+SECURE_SSL_REDIRECT = env_bool(
+    'DJANGO_SECURE_SSL_REDIRECT',
+    default=False,
+)
+
+SESSION_COOKIE_SECURE = env_bool(
+    'DJANGO_SESSION_COOKIE_SECURE',
+    default=False,
+)
+
+CSRF_COOKIE_SECURE = env_bool(
+    'DJANGO_CSRF_COOKIE_SECURE',
+    default=False,
+)
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
 
 
 # Database configuration - MySQL

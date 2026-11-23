@@ -1,3 +1,4 @@
+
 {% extends 'core/base.html' %}
 
 {% block title %}Log in · FrameFlow{% endblock %}
@@ -11,6 +12,7 @@
 
         <form method="post" action="{% url 'core:login' %}">
           {% csrf_token %}
+
           {% if form.non_field_errors %}
             <div class="alert alert-danger" role="alert">
               {% for error in form.non_field_errors %}
@@ -20,25 +22,70 @@
           {% endif %}
 
           <div class="mb-3">
-            <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
-            <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}"
-                   class="form-control" value="{{ form.username.value|default:'' }}"
-                   autocomplete="username" required autofocus>
+            <label for="{{ form.username.id_for_label }}" class="form-label">
+              Username
+            </label>
+
+            <input
+              type="text"
+              name="{{ form.username.html_name }}"
+              id="{{ form.username.id_for_label }}"
+              class="form-control"
+              value="{{ form.username.value|default:'' }}"
+              autocomplete="username"
+              required
+              autofocus
+              {% if form.username.errors %}
+                aria-invalid="true"
+                aria-describedby="id_username_error"
+              {% endif %}
+            >
+
+            {% for error in form.username.errors %}
+              <div id="id_username_error" class="invalid-feedback d-block">
+                {{ error }}
+              </div>
+            {% endfor %}
           </div>
 
           <div class="mb-3">
-            <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
-            <input type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}"
-                   class="form-control" autocomplete="current-password" required>
+            <label for="{{ form.password.id_for_label }}" class="form-label">
+              Password
+            </label>
+
+            <input
+              type="password"
+              name="{{ form.password.html_name }}"
+              id="{{ form.password.id_for_label }}"
+              class="form-control"
+              autocomplete="current-password"
+              required
+              {% if form.password.errors %}
+                aria-invalid="true"
+                aria-describedby="id_password_error"
+              {% endif %}
+            >
+
+            {% for error in form.password.errors %}
+              <div id="id_password_error" class="invalid-feedback d-block">
+                {{ error }}
+              </div>
+            {% endfor %}
           </div>
 
           <input type="hidden" name="next" value="{{ request.GET.next }}">
 
           <div class="d-grid">
-            <button type="submit" class="btn ff-btn-primary">Login</button>
+            <button type="submit" class="btn ff-btn-primary">
+              Login
+            </button>
           </div>
         </form>
-        <p class="text-center small mt-3 mb-0">New to FrameFlow? <a href="{% url 'core:signup' %}">Create an account</a></p>
+
+        <p class="text-center small mt-3 mb-0">
+          New to FrameFlow?
+          <a href="{% url 'core:signup' %}">Create an account</a>
+        </p>
       </div>
     </div>
   </div>

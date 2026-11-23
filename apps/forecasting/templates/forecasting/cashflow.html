@@ -19,26 +19,151 @@
       <div class="mb-3">
         <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
         {{ field }}
-        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        {% for error in field.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
       </div>
       {% endfor %}
       <button type="submit" class="btn ff-btn-primary">Generate forecast</button>
     </form>
-    <p class="text-muted small">Generates 30-, 60- and 90-day forecasts together, dated from today in {{ studio.timezone }}. Each generation is saved as a new snapshot.</p>
+
+    <p class="text-muted small">
+      Generates 30-, 60- and 90-day forecasts together, dated from today in {{ studio.timezone }}.
+      Each generation is saved as a new snapshot.
+    </p>
   </div>
 </div>
 
 {% if not has_runs %}
-<p class="text-muted">No forecast yet. Generate one to see projections.</p>
+<p class="text-muted mt-4">No forecast yet. Generate one to see projections.</p>
 {% else %}
 
 {% if first_negative %}
-<div class="alert alert-danger" role="alert"><strong>Projected cash goes negative.</strong> The {{ first_negative.horizon }}-day forecast first dips below zero in the period {{ first_negative.bucket_start }} to {{ first_negative.bucket_end }}, at {{ first_negative.running_balance }}.</div>
+<div class="alert alert-danger mt-4" role="alert">
+  <strong>Projected cash goes negative.</strong>
+  The {{ first_negative.horizon }}-day forecast first dips below zero in the period
+  {{ first_negative.bucket_start }} to {{ first_negative.bucket_end }},
+  at {{ first_negative.running_balance }}.
+</div>
 {% else %}
-<div class="alert alert-success" role="alert">No negative projected balance in the 30-, 60- or 90-day forecasts.</div>
+<div class="alert alert-success mt-4" role="alert">
+  No negative projected balance in the 30-, 60- or 90-day forecasts.
+</div>
 {% endif %}
 
+<!-- Cash-flow projection chart -->
+<h2 class="h5 mt-4">Projected cash balance</h2>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <div style="height: 320px; position: relative;">
+      <canvas
+        id="cashflowChart"
+        role="img"
+        aria-label="Projected cash balance for 30, 60 and 90 days">
+        Projected cash balance chart.
+      </canvas>
+    </div>
+    <p class="text-muted small mt-2 mb-0">
+      Shows the projected running cash balance using your saved forecast snapshots.
+    </p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('cashflowChart');
+
+    if (!canvas) {
+      return;
+    }
+
+    const chartLabels = {{ chart_labels|safe }};
+    const chartDatasets = {{ chart_datasets|safe }};
+
+    if (typeof Chart === 'undefined') {
+      canvas.insertAdjacentText(
+        'afterend',
+        'Chart library could not be loaded. Please check your internet connection.'
+      );
+      return;
+    }
+
+    const chartColors = ['#14B8A6', '#F59E0B', '#3B82F6'];
+
+    new Chart(canvas, {
+      type: 'line',
+
+      data: {
+        labels: chartLabels,
+        datasets: chartDatasets.map((dataset, index) => ({
+          label: dataset.label,
+          data: dataset.data,
+          borderColor: chartColors[index],
+          backgroundColor: chartColors[index],
+          borderWidth: 3,
+          tension: 0.3,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          fill: false
+        }))
+      },
+
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.dataset.label + ': ₹' +
+                  context.parsed.y.toLocaleString('en-IN');
+              }
+            }
+          }
+        },
+
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Forecast period'
+            }
+          },
+
+          y: {
+            title: {
+              display: true,
+              text: 'Balance (INR)'
+            },
+
+            ticks: {
+              callback: function(value) {
+                return '₹' + value.toLocaleString('en-IN');
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
+
+<!-- Forecast comparison -->
 <h2 class="h5 mt-4">Forecast comparison</h2>
+
 <div class="table-responsive">
   <table class="table align-middle">
     <thead>
@@ -49,15 +174,23 @@
         {% endfor %}
       </tr>
     </thead>
+
     <tbody>
       {% for row in rows %}
-      <tr><th scope="row">{{ row.label }}</th>{% for value in row.values %}<td>{{ value }}</td>{% endfor %}</tr>
+      <tr>
+        <th scope="row">{{ row.label }}</th>
+        {% for value in row.values %}
+        <td>{{ value }}</td>
+        {% endfor %}
+      </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 
+<!-- Overdue invoices -->
 <h2 class="h5 mt-4">Overdue invoices</h2>
+
 <div class="table-responsive">
   <table class="table align-middle">
     <thead>
@@ -66,17 +199,32 @@
         <th>Overdue (not in forecast window)</th>
       </tr>
     </thead>
+
     <tbody>
       {% for item in overdue %}
-      <tr><th scope="row">{{ item.days }}-day forecast</th><td>{{ item.value }}</td></tr>
+      <tr>
+        <th scope="row">{{ item.days }}-day forecast</th>
+        <td>{{ item.value }}</td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 
-<p class="text-muted small">Expected income is the total of draft invoices, placed in the final period of each forecast. Scheduled expenses include only expenses dated after the forecast date. Past expenses are assumed to be included in the opening balance.</p>
+<p class="text-muted small">
+  Expected income is the total of draft invoices, placed in the final period of each forecast.
+  Scheduled expenses include only expenses dated after the forecast date.
+  Past expenses are assumed to be included in the opening balance.
+</p>
 
-<p class="text-muted small">Latest snapshots: {% for run in runs %}{{ run.horizon_days }}-day as of {{ run.as_of|date:"Y-m-d" }} (created {{ run.created_at|date:"Y-m-d H:i" }}){% if not forloop.last %}; {% endif %}{% endfor %}.</p>
+<p class="text-muted small">
+  Latest snapshots:
+  {% for run in runs %}
+  {{ run.horizon_days }}-day as of {{ run.as_of|date:"Y-m-d" }}
+  (created {{ run.created_at|date:"Y-m-d H:i" }})
+  {% if not forloop.last %}; {% endif %}
+  {% endfor %}.
+</p>
 
 {% endif %}
 {% endblock %}
